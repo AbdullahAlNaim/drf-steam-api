@@ -1,0 +1,12 @@
+# Python bytecode files
+__pycache__/
+
+steam_api/__pycache__/
+
+# Local database file
+db.sqlite3
+
+# Sensitive settings file
+core/settings.py
+
+.env
