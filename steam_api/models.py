@@ -2,6 +2,8 @@ from django.db import models
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+from django.utils import timezone
 
 load_dotenv()
 
@@ -23,10 +25,6 @@ class ExternalDataManager(models.Manager):
                 print(f'added {external_data}')
                 external_data.save()
 
-class SecondExternalDataManager(models.Manager):
-    def fetch_and_save_data(self):
-        url = os.environ.get('EXTERNAL_API_URL_2') 
-        # {"response":{"player_count":40356,"result":1}}
 
 # Create your models here.
 class ExternalData(models.Model):
@@ -38,12 +36,44 @@ class ExternalData(models.Model):
 
     objects = ExternalDataManager()
 
+class SecondExternalDataManager(models.Manager):
+    def fetch_and_save_data(self):
+        queryset = ExternalData.objects.all()
+        for n in range(10):
+            url = str(os.environ.get('EXTERNAL_API_URL_2')) + str(queryset[n].game_id)
+            response = requests.get(url)
+            data = response.json()
+            try:
+                pop = data['response']['player_count']
+                external_data = PlayerCount(
+                    game_id = queryset[n].game_id,
+                    player_count = pop
+                )
+                external_data.save()
+
+                print(n, 'adding: ',  data['response']['result'],  data['response']['player_count'])
+            except KeyError:
+                external_data = PlayerCount(
+                    game_id = queryset[n].game_id,
+                    player_count = 0
+                )
+                external_data.save()
+
+                print(n, 'adding: ',  data['response']['result'],  0)
+        # {"response":{"player_count":40356,"result":1}}
+
 class PlayerPop(models.Model):
     game_id = models.IntegerField()
     player_count = models.IntegerField()
     results = models.IntegerField()
 
+    objects = SecondExternalDataManager()
 
+class PlayerCount(models.Model):
+    game_id = models.IntegerField()
+    player_count = models.IntegerField()
+    # results = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True,)
+    updated_at = models.DateTimeField(auto_now=True)
 
-
-
+    objects = SecondExternalDataManager()

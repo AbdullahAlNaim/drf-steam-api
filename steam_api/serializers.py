@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ExternalData, PlayerPop
+from .models import ExternalData, PlayerCount
 
 
 class ExternalDataSerializer(serializers.ModelSerializer):
@@ -9,5 +9,5 @@ class ExternalDataSerializer(serializers.ModelSerializer):
 
 class PlayerPopSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PlayerPop
+        model = PlayerCount
         fields = '__all__'
