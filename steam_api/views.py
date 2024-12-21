@@ -2,7 +2,6 @@ from django.shortcuts import render
 from .models import ExternalData, PlayerCount
 from .serializers import ExternalDataSerializer, PlayerPopSerializer
 from rest_framework import generics
-import os
 from dotenv import load_dotenv
 
 load_dotenv()

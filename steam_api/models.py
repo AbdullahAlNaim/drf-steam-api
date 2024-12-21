@@ -40,7 +40,8 @@ class SecondExternalDataManager(models.Manager):
     def fetch_and_save_data(self):
         queryset = ExternalData.objects.all()
         for n in range(10):
-            url = str(os.environ.get('EXTERNAL_API_URL_2')) + str(queryset[n].game_id)
+            steam_game_id = queryset[n].game_id
+            url = str(os.environ.get('EXTERNAL_API_URL_2')) + str(steam_game_id)
             response = requests.get(url)
             data = response.json()
             try:
@@ -51,10 +52,10 @@ class SecondExternalDataManager(models.Manager):
                 )
                 external_data.save()
 
-                print(n, 'adding: ',  data['response']['result'],  data['response']['player_count'])
+                print(n, 'adding: ',  steam_game_id,  data['response']['player_count'])
             except KeyError:
                 external_data = PlayerCount(
-                    game_id = queryset[n].game_id,
+                    game_id = steam_game_id,
                     player_count = 0
                 )
                 external_data.save()
